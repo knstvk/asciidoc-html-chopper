@@ -126,66 +126,40 @@ ul.toc-root>li {
         return sb.toString()
     }
 
+    private fun printTocItem(hierarchy: List<Section>): String {
+        val sb = StringBuilder()
+
+        val inHierarchy = hierarchy.contains(this)
+        val isSelected = this == hierarchy.last()
+
+        sb.append("\n<li class='toc-item'>${getTocMarker(this, inHierarchy)}${getTocA(this, isSelected)}");
+        if (inHierarchy) {
+            sb.append("\n<ul>")
+            for (child in children) {
+                sb.append(child.printTocItem(hierarchy))
+            }
+            sb.append("\n</ul>")
+        }
+        sb.append("\n</li>")
+
+        return sb.toString()
+    }
+
     private fun createToc(): String {
         val sb = StringBuilder()
 
-        val parents: MutableList<Section> = getParentsFromTop()
-
         sb.append("\n<ul class='toc-root'>")
-        val root = parents[0]
-        sb.append("\n<li><div class='toc-marker'></div>${getTocA(root, false)}</li>");
 
-        val myTopItem = if (parents.size > 1) parents[1] else this
+        val hierarchy = getHierarchy()
+        val root = hierarchy[0]
 
-        for (topItem in root.children) {
-            if (parents.size > 1) {
-                sb.append("\n<li>${getTocMarker(topItem, topItem == myTopItem)}${getTocA(topItem, false)}");
-            }
-            if (topItem == myTopItem) {
-                if (parents.size > 2) {
-                    for (p in parents.subList(2, parents.size)) {
-                        sb.append("\n<ul>")
-                        sb.append("\n<li class='toc-item'>${getTocMarker(p, true)}${getTocA(p, false)}");
-                    }
-                }
+        sb.append("\n<li>${getTocA(root, false)}</li>");
 
-                if (parent != null) {
-                    if (parents.size > 1) {
-                        sb.append("\n<ul>")
-                    }
-                    // siblings
-                    for (sibling in parent.children) {
-                        sb.append("<li")
-                        if (parent.parent != null) {
-                            // not a first level item
-                            sb.append(" class='toc-item'")
-                        }
-                        sb.append(">${getTocMarker(sibling, sibling === this)}${getTocA(sibling, sibling === this)}")
-                        if (sibling === this) {
-                            // children
-                            if (!children.isEmpty()) {
-                                sb.append("\n<ul>")
-                                for (child in children) {
-                                    sb.append("<li class='toc-item'>${getTocMarker(child, false)}${getTocA(child, false)}</li>")
-                                }
-                                sb.append("\n</ul>")
-                            }
-                        }
-                        sb.append("</li>")
-                    }
-                    if (parents.size > 1) {
-                        sb.append("\n</ul>")
-                    }
-                }
-
-                if (parents.size > 2) {
-                    for (p in parents.subList(2, parents.size)) {
-                        sb.append("\n</li>\n</ul>")
-                    }
-                }
-            }
-            sb.append("</li>")
+        for (item in root.children) {
+            sb.append(item.printTocItem(hierarchy))
         }
+
+        sb.append("\n</ul>")
         return sb.toString()
     }
 
@@ -211,7 +185,7 @@ ul.toc-root>li {
         return sb.toString()
     }
 
-    private fun getParentsFromTop(): MutableList<Section> {
+    private fun getHierarchy(): List<Section> {
         val parents: MutableList<Section> = ArrayList()
         var p = parent
         while (p != null) {
@@ -219,6 +193,7 @@ ul.toc-root>li {
             p = p.parent
         }
         parents.reverse()
+        parents.add(this)
         return parents
     }
 
