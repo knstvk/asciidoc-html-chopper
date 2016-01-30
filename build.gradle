@@ -1,0 +1,34 @@
+buildscript {
+    ext.kotlinVersion = '1.0.0-beta-4589'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'idea'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile 'org.jsoup:jsoup:1.8.3'
+}
+
+sourceSets {
+    main {
+        java { srcDir 'src' }
+        resources { srcDir 'src' }
+        kotlin { srcDir 'src' }
+    }
+    test {
+        java { srcDir 'test' }
+        resources { srcDir 'test' }
+        kotlin { srcDir 'src' }
+    }
+}
