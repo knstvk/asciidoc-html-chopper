@@ -12,7 +12,14 @@ fun main(args: Array<String>) {
     val input = File(srcDir, "manual.html")
     val doc = Jsoup.parse(input, "UTF-8")
 
-    val rootSect = Section(doc, 0, null)
+    val headerEl = doc.getElementById("header") ?: throw IllegalStateException("Element with id='header' is not found")
+    val contentEl = doc.getElementById("content") ?: throw IllegalStateException("Element with id='content' is not found")
+    doc.getElementById("toc")?.remove()
+    val rootSect = Section(contentEl, 0, null)
+    rootSect.headerEl = headerEl
+
+    val docTitle = headerEl.getElementsByTag("h1").first()?.ownText()
+    rootSect.title = docTitle ?: "Index"
     rootSect.parse()
 
     val links: MutableMap<String, Section> = HashMap()
@@ -33,7 +40,7 @@ fun main(args: Array<String>) {
         it.copyRecursively(File(outputDir, it.name))
     }
 
-    write(outputDir, doc, rootSect, links)
+    rootSect.write(outputDir, links)
 }
 
 fun collectLinks(sect: Section, links: MutableMap<String, Section>) {
@@ -44,18 +51,5 @@ fun collectLinks(sect: Section, links: MutableMap<String, Section>) {
     }
     for (childSect in sect.children) {
         collectLinks(childSect, links)
-    }
-}
-
-fun write(dir: File, doc: Document, rootSect: Section, links: MutableMap<String, Section>) {
-    rootSect.replaceLinks(links)
-    val tocEl = doc.body().getElementById("toc") ?: throw IllegalStateException("'toc' element is not found")
-    val firstTocEl = tocEl.getElementsByClass("sectlevel1").first()
-    firstTocEl.prepend("""<li><a href="index.html">Home</a></li>""")
-
-    val file = File(dir, "index.html")
-    file.writeText(doc.outerHtml(), "UTF-8")
-    for (sect in rootSect.children) {
-        sect.write(dir, links, tocEl)
     }
 }

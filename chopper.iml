@@ -35,11 +35,66 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-core/5.4.1/c52b2088e2c30dfd95fd296ab6fb9cf8de9855ab/lucene-core-5.4.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-core/5.4.1/36ed5295434646135304692cd257e94e135e66bc/lucene-core-5.4.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-queryparser/5.4.1/dccd5279bfa656dec21af444a7a66820eb1cd618/lucene-queryparser-5.4.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-queryparser/5.4.1/e0038ab71c06c952657d7c91755b2201a3937219/lucene-queryparser-5.4.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-analyzers-common/5.4.1/c2aa2c4e00eb9cdeb5ac00dc0495e70c441f681e/lucene-analyzers-common-5.4.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-analyzers-common/5.4.1/29ca0c29fc416d6d5db849dfa60521bf6fcfef17/lucene-analyzers-common-5.4.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-runtime/1.0.0-beta-4589/7d0a683599f8fa2d5fea55ad8bc3ca3f51a8354a/kotlin-runtime-1.0.0-beta-4589.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-runtime/1.0.0-beta-4589/ebc8aaa4659e8349a28f64312849bab731e0170e/kotlin-runtime-1.0.0-beta-4589-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-queries/5.4.1/cbb34afcf0596e75731a493227eece69ac117522/lucene-queries-5.4.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-queries/5.4.1/9d038dc92cec7e9e69d0da2f3c90b6ed3d389d90/lucene-queries-5.4.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-sandbox/5.4.1/a2d8767abd7865048e6150bc689f5c942fc64048/lucene-sandbox-5.4.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.lucene/lucene-sandbox/5.4.1/f98b12de5fa357ed367fccc9fe315ab914f54b4e/lucene-sandbox-5.4.1-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

@@ -1,0 +1,25 @@
+li.toc-item {
+    padding: 3px 0pt 3px 16px;
+}
+ul.toc-root>li {
+    padding: 3px 0pt 3px 0px;
+}
+#toc .toc-link {
+    padding-left: 10px;
+}
+.toc-marker {
+    display: inline-block;
+    position: absolute;
+    margin-top: 5px;
+    border-style: solid;
+    border-width: 0 0 6px 6px;
+    border-color: transparent;
+}
+.toc-marker.open {
+    border-width: 0 0 6px 6px;
+    border-color: transparent transparent rgb(192, 192, 192) transparent;
+}
+.toc-marker.closed {
+    border-width: 4px 0 4px 5px;
+    border-color: transparent transparent transparent rgb(192, 192, 192);
+}

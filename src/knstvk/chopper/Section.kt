@@ -16,16 +16,14 @@ class Section (element: Element, level: Int, parent: Section?) {
     lateinit var headerEl: Element
     lateinit var id: String
     lateinit var title: String
-    lateinit var pageTitle: String
+    lateinit var tocItem: String
 
     private val SECTION_NUM_PATTERN = Pattern.compile("""(\d+\.)+ """)
 
     fun parse() {
         if (parent == null) {
-            headerEl = element
             id = "index"
-            title = "Home"
-            pageTitle = "Home"
+            tocItem = "Home"
         } else {
             val hEls = element.getElementsByTag("h${level + 1}")
             if (hEls.isEmpty())
@@ -37,9 +35,8 @@ class Section (element: Element, level: Int, parent: Section?) {
                 throw IllegalStateException("No 'id' attribute in '${getBeginning()}'")
             this.id = id
 
-            title = headerEl.ownText()
-
-            pageTitle = SECTION_NUM_PATTERN.matcher(title).replaceFirst("")
+            tocItem = SECTION_NUM_PATTERN.matcher(headerEl.ownText()).replaceFirst("")
+            title = tocItem + " | " + getHierarchy()[0].title
 
             val ancorEls = headerEl.getElementsByClass("anchor")
             if (ancorEls.isNotEmpty()) {
@@ -67,9 +64,9 @@ class Section (element: Element, level: Int, parent: Section?) {
     private fun getHtmlContent(): String {
         val html = File("templates", "page.html").readText()
         return html
-                .replace("{title}", pageTitle)
+                .replace("{title}", title)
                 .replace("{toc}", createToc())
-                .replace("{content}", element.outerHtml())
+                .replace("{content}", if (parent == null) headerEl.outerHtml() else element.outerHtml())
     }
 
     private fun printTocItem(hierarchy: List<Section>): String {
@@ -127,7 +124,7 @@ class Section (element: Element, level: Int, parent: Section?) {
         sb.append("<div class='toc-link'><a href='${section.id}.html'")
         if (active)
             sb.append(" class='toc-highlighted'")
-        sb.append(">${section.pageTitle}</a></div>")
+        sb.append(">${section.tocItem}</a></div>")
         return sb.toString()
     }
 
@@ -143,13 +140,13 @@ class Section (element: Element, level: Int, parent: Section?) {
         return parents
     }
 
-    fun write(dir: File, links: MutableMap<String, Section>, tocEl: Element) {
+    fun write(dir: File, links: MutableMap<String, Section>) {
         replaceLinks(links)
 
         val file = File(dir, id + ".html")
         file.writeText(getHtmlContent(), "UTF-8")
         for (childSect in children) {
-            childSect.write(dir, links, tocEl)
+            childSect.write(dir, links)
         }
     }
 
