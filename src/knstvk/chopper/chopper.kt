@@ -6,9 +6,9 @@ import java.io.File
 import java.util.*
 
 fun main(args: Array<String>) {
-//    val srcDir = File("""D:\work\platform\doc\build\simple\en\html-single""")
+//    val srcDir = File("""input\simple\en\html-single""")
 //    val input = File(srcDir, "simple.html")
-    val srcDir = File("""D:\work\platform\doc\build\manual\en\html-single""")
+    val srcDir = File("""input\manual\en\html-single""")
     val input = File(srcDir, "manual.html")
     val doc = Jsoup.parse(input, "UTF-8")
 
@@ -18,19 +18,22 @@ fun main(args: Array<String>) {
     val links: MutableMap<String, Section> = HashMap()
     collectLinks(rootSect, links)
 
-    val dir = File("output")
-    if (dir.exists()) {
-        dir.deleteRecursively()
+    val outputDir = File("output")
+    if (outputDir.exists()) {
+        outputDir.deleteRecursively()
     }
-    dir.mkdir()
+    outputDir.mkdir()
 
-    File(srcDir, "styles").copyRecursively(File(dir, "styles"))
+    srcDir.listFiles { file: File -> file.isDirectory }.forEach {
+        it.copyRecursively(File(outputDir, it.name))
+    }
 
-    val jsDestDir = File(dir, "js")
-    File(srcDir, "js").copyRecursively(jsDestDir)
-    File("js", "toc-controller-chunked.js").copyTo(File(jsDestDir, "toc-controller-chunked.js"))
+    val warTemplDir = File("templates", "war")
+    warTemplDir.listFiles().forEach {
+        it.copyRecursively(File(outputDir, it.name))
+    }
 
-    write(dir, doc, rootSect, links)
+    write(outputDir, doc, rootSect, links)
 }
 
 fun collectLinks(sect: Section, links: MutableMap<String, Section>) {

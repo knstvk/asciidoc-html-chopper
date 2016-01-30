@@ -65,65 +65,11 @@ class Section (element: Element, level: Int, parent: Section?) {
     private fun getBeginning(): String = element.outerHtml().substring(0, 100) + "..."
 
     private fun getHtmlContent(): String {
-        val sb = StringBuilder()
-        sb.append("""<!doctype html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>$pageTitle</title>
-<link rel="stylesheet" href="styles/jquery.treeview.css">
-<link rel="stylesheet" href="./styles/cuba.css">
-<link rel="stylesheet" href="./styles/coderay-asciidoctor.css">
-<style>
-li.toc-item {
-	padding: 3px 0pt 3px 16px;
-}
-ul.toc-root>li {
-	padding: 3px 0pt 3px 0px;
-}
-#toc .toc-link {
-    padding-left: 10px;
-}
-.toc-marker {
-    display: inline-block;
-    position: absolute;
-    margin-top: 5px;
-    border-style: solid;
-    border-width: 0 0 6px 6px;
-    border-color: transparent;
-}
-.toc-marker.open {
-    border-width: 0 0 6px 6px;
-    border-color: transparent transparent rgb(192, 192, 192) transparent;
-}
-.toc-marker.closed {
-    border-width: 4px 0 4px 5px;
-    border-color: transparent transparent transparent rgb(192, 192, 192);
-}
-</style
-</head>
-<body class="book toc2 toc-left">
- <div id="header">
-  <div id="toc" class="toc2">
-""")
-        sb.append(createToc())
-        sb.append("""
-  </div>
- </div>
-""")
-        sb.append("""<div id="content">""")
-        sb.append(element.outerHtml())
-        sb.append("""
-</div>
-<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
-<script type="text/javascript" src="js/jquery.treeview.js"></script>
-<script type="text/javascript" src="js/jquery.nearest.min.js"></script>
-<script type="text/javascript" src="js/toc-controller-chunked.js"></script>
-<a href="#" id="toc-position-marker">. . .</a>
-</body>
-</html>
-""")
-        return sb.toString()
+        val html = File("templates", "page.html").readText()
+        return html
+                .replace("{title}", pageTitle)
+                .replace("{toc}", createToc())
+                .replace("{content}", element.outerHtml())
     }
 
     private fun printTocItem(hierarchy: List<Section>): String {
