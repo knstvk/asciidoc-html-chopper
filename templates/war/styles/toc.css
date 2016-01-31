@@ -1,3 +1,11 @@
+form.search {
+    margin-bottom: 5px;
+}
+
+#searchTerms {
+    width: 150px;
+}
+
 li.toc-item {
     padding: 3px 0pt 3px 16px;
 }

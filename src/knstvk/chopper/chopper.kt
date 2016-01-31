@@ -1,7 +1,10 @@
 package knstvk.chopper
 
+import org.apache.lucene.analysis.standard.StandardAnalyzer
+import org.apache.lucene.index.IndexWriter
+import org.apache.lucene.index.IndexWriterConfig
+import org.apache.lucene.store.FSDirectory
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import java.io.File
 import java.util.*
 
@@ -40,7 +43,15 @@ fun main(args: Array<String>) {
         it.copyRecursively(File(outputDir, it.name))
     }
 
-    rootSect.write(outputDir, links)
+    val dir = FSDirectory.open(File(outputDir, "index").toPath())
+    val analyzer = StandardAnalyzer()
+    val iwc = IndexWriterConfig(analyzer)
+    iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND)
+    val indexWriter = IndexWriter(dir, iwc)
+
+    rootSect.write(outputDir, links, indexWriter)
+
+    indexWriter.close()
 }
 
 fun collectLinks(sect: Section, links: MutableMap<String, Section>) {

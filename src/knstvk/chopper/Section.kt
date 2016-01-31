@@ -1,7 +1,13 @@
 package knstvk.chopper
 
+import org.apache.lucene.document.Document
+import org.apache.lucene.document.Field
+import org.apache.lucene.document.StringField
+import org.apache.lucene.document.TextField
+import org.apache.lucene.index.IndexWriter
 import org.jsoup.nodes.Element
 import java.io.File
+import java.io.StringReader
 import java.util.*
 import java.util.regex.Pattern
 
@@ -140,13 +146,21 @@ class Section (element: Element, level: Int, parent: Section?) {
         return parents
     }
 
-    fun write(dir: File, links: MutableMap<String, Section>) {
+    fun write(dir: File, links: MutableMap<String, Section>, indexWriter: IndexWriter?) {
         replaceLinks(links)
 
-        val file = File(dir, id + ".html")
-        file.writeText(getHtmlContent(), "UTF-8")
+        val content = getHtmlContent()
+
+        val fileName = id + ".html"
+        val file = File(dir, fileName)
+        file.writeText(content, "UTF-8")
+
+        if (indexWriter != null) {
+            indexFile(content, fileName, indexWriter)
+        }
+
         for (childSect in children) {
-            childSect.write(dir, links)
+            childSect.write(dir, links, indexWriter)
         }
     }
 
@@ -169,4 +183,12 @@ class Section (element: Element, level: Int, parent: Section?) {
         }
     }
 
+    private fun indexFile(contents: String, fileName: String, indexWriter: IndexWriter) {
+        val doc = Document()
+
+        doc.add(StringField("fileName", fileName, Field.Store.YES))
+        doc.add(TextField("contents", StringReader(contents)))
+
+        indexWriter.addDocument(doc)
+    }
 }
