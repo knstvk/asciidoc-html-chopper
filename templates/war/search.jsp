@@ -16,6 +16,28 @@
     </style>
 </head>
 <body class="book toc2 toc-left">
+<%!
+	Path indexDir = null;
+	
+	public void jspInit() { 
+		try {
+			Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
+			indexDir = Files.createTempDirectory(tmpDir, "index");  
+			System.out.println("Copying index to " + indexDir);
+
+			Set<String> resourcePaths = getServletContext().getResourcePaths("/index");
+			for (String resource : resourcePaths) {
+				Path file = indexDir.resolve(Paths.get(resource).getFileName());
+				InputStream is = getServletContext().getResourceAsStream(resource);
+				Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Error initializing JSP: " + e);
+		}
+	}
+
+%>
 <div id="toc" class="toc2">
     <form action="search.jsp" class="search">
         <input type="text" name="searchTerms" value="<%= request.getParameter("searchTerms") %>">
@@ -26,31 +48,23 @@
 <div id="content">
     {content}
 <%
-Path tmpDir = Paths.get(System.getProperty("catalina.home") + "/work/index");
-System.out.println(tmpDir);
-Files.createDirectories(tmpDir);
-
-Set<String> resourcePaths = getServletContext().getResourcePaths("/index");
-for (String resource : resourcePaths) {
-	Path file = tmpDir.resolve(Paths.get(resource).getFileName());
-	InputStream is = getServletContext().getResourceAsStream(resource);
-	Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
-}
-IndexReader reader = DirectoryReader.open(FSDirectory.open(tmpDir));
-IndexSearcher searcher = new IndexSearcher(reader);
-Analyzer analyzer = new StandardAnalyzer();
-QueryParser parser = new QueryParser("contents", analyzer);
-Query query = parser.parse(request.getParameter("searchTerms"));
-TopDocs results = searcher.search(query, 100);
-ScoreDoc[] hits = results.scoreDocs;
-out.println(results.totalHits + " matching documents:<br>");
-for (int i = 0; i < hits.length; i++) {
-	Document doc = searcher.doc(hits[i].doc);
-	String fileName = doc.get("fileName");
-	out.println(fileName);
-	out.println("<br>");
-}
-reader.close();
+	IndexReader reader = DirectoryReader.open(FSDirectory.open(indexDir));
+	IndexSearcher searcher = new IndexSearcher(reader);
+	Analyzer analyzer = new StandardAnalyzer();
+	QueryParser parser = new QueryParser("contents", analyzer);
+	Query query = parser.parse(request.getParameter("searchTerms"));
+	TopDocs results = searcher.search(query, 100);
+	ScoreDoc[] hits = results.scoreDocs;
+	out.println("<p>" + results.totalHits + " matching documents for: " + request.getParameter("searchTerms") + "</p>");
+	for (int i = 0; i < hits.length; i++) {
+		Document doc = searcher.doc(hits[i].doc);
+		String fileName = doc.get("fileName");
+		String caption = doc.get("caption");
+		%>
+		<p><a href="<%= fileName %>"><%= caption %></a></p>
+		<%	
+	}
+	reader.close();
 %>
 </div>
 </body>

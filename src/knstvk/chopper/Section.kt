@@ -1,5 +1,6 @@
 package knstvk.chopper
 
+import org.apache.commons.lang3.StringEscapeUtils
 import org.apache.lucene.document.Document
 import org.apache.lucene.document.Field
 import org.apache.lucene.document.StringField
@@ -156,7 +157,7 @@ class Section (element: Element, level: Int, parent: Section?) {
         file.writeText(content, "UTF-8")
 
         if (indexWriter != null) {
-            indexFile(content, fileName, indexWriter)
+            indexFile(element.outerHtml(), fileName, indexWriter)
         }
 
         for (childSect in children) {
@@ -184,9 +185,18 @@ class Section (element: Element, level: Int, parent: Section?) {
     }
 
     private fun indexFile(contents: String, fileName: String, indexWriter: IndexWriter) {
+        val caption: String
+        val hierarchy = getHierarchy()
+        if (hierarchy.size == 1) {
+            caption = tocItem
+        } else {
+            caption = hierarchy.subList(1, hierarchy.size).map { it.tocItem }.joinToString(" / ")
+        }
+
         val doc = Document()
 
         doc.add(StringField("fileName", fileName, Field.Store.YES))
+        doc.add(StringField("caption", StringEscapeUtils.escapeHtml4(caption), Field.Store.YES))
         doc.add(TextField("contents", StringReader(contents)))
 
         indexWriter.addDocument(doc)
