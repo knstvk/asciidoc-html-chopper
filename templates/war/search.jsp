@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%@ page import="java.util.*,java.io.*,java.nio.file.*" %>    
 <%@ page import="org.apache.lucene.analysis.*,org.apache.lucene.analysis.standard.StandardAnalyzer" %>    
 <%@ page import="org.apache.lucene.document.Document,org.apache.lucene.index.*" %>    
@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <title>Search Results</title>
     <link rel="stylesheet" href="./styles/cuba.css">
-    <link rel="stylesheet" href="./styles/toc.css">
+    <link rel="stylesheet" href="./styles/chopper.css">
     <link rel="stylesheet" href="./styles/coderay-asciidoctor.css">
     <style>
     </style>
@@ -45,8 +45,13 @@
     </form>
     {toc}
 </div>
+<div id="top">
+    <div id="title">CUBA Platform. Developer’s Manual</div>
+    <div id="version">Version 6.0</div>
+    <div id="copyright">Copyright (c) 2016 <a href="http://www.haulmont.com" target="_blank">Haulmont</a></div>
+</div>
 <div id="content">
-    {content}
+    <div id="search-results">
 <%
 	IndexReader reader = DirectoryReader.open(FSDirectory.open(indexDir));
 	IndexSearcher searcher = new IndexSearcher(reader);
@@ -55,17 +60,18 @@
 	Query query = parser.parse(request.getParameter("searchTerms"));
 	TopDocs results = searcher.search(query, 100);
 	ScoreDoc[] hits = results.scoreDocs;
-	out.println("<p>" + results.totalHits + " matching documents for: " + request.getParameter("searchTerms") + "</p>");
+	out.println("<p>" + results.totalHits + " results for: " + request.getParameter("searchTerms") + "</p>");
 	for (int i = 0; i < hits.length; i++) {
 		Document doc = searcher.doc(hits[i].doc);
 		String fileName = doc.get("fileName");
 		String caption = doc.get("caption");
 		%>
-		<p><a href="<%= fileName %>"><%= caption %></a></p>
+		<p><a href="<%= fileName %>"><%= caption %></a> <span class="score"><%= hits[i].score %></span></p>
 		<%	
 	}
 	reader.close();
 %>
+	</div>
 </div>
 </body>
 </html>

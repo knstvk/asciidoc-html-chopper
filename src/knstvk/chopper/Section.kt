@@ -69,11 +69,12 @@ class Section (element: Element, level: Int, parent: Section?) {
     private fun getBeginning(): String = element.outerHtml().substring(0, 100) + "..."
 
     private fun getHtmlContent(): String {
-        val html = File("templates", "page.html").readText()
+        val template = if (parent == null) "index.html" else "page.html"
+        val html = File("templates", template).readText()
         return html
-                .replace("{title}", title)
-                .replace("{toc}", createToc())
-                .replace("{content}", if (parent == null) headerEl.outerHtml() else element.outerHtml())
+                .replace("{{title}}", title)
+                .replace("{{toc}}", createToc())
+                .replace("{{content}}", if (parent == null) headerEl.outerHtml() else element.outerHtml())
     }
 
     private fun printTocItem(hierarchy: List<Section>): String {
@@ -157,7 +158,7 @@ class Section (element: Element, level: Int, parent: Section?) {
         file.writeText(content, "UTF-8")
 
         if (indexWriter != null) {
-            indexFile(element.outerHtml(), fileName, indexWriter)
+            indexFile(element.text(), fileName, indexWriter)
         }
 
         for (childSect in children) {
@@ -190,7 +191,7 @@ class Section (element: Element, level: Int, parent: Section?) {
         if (hierarchy.size == 1) {
             caption = tocItem
         } else {
-            caption = hierarchy.subList(1, hierarchy.size).map { it.tocItem }.joinToString(" / ")
+            caption = hierarchy.subList(1, hierarchy.size).map { it.tocItem }.joinToString(" > ")
         }
 
         val doc = Document()

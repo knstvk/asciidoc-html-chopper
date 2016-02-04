@@ -1,0 +1,133 @@
+
+#top {
+    margin-left: 30px;
+    margin-right: 20px;    
+    border-bottom: 1px solid #ddd;
+    padding-top: 8px;    
+    padding-bottom: 8px;    
+}
+
+#top #title {
+    color: #0b6ec7;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: left;
+}
+
+#top #version {
+    color: #0b6ec7;
+    font-size: 0.9em;
+    font-weight: bold;
+    text-align: left;
+    display: inline-block;
+}
+
+#top #copyright {
+    color: #a2a2a2;
+    font-size: .9em;
+    display: inline-block;
+    float: right;   
+}
+
+#top #copyright a {
+    color: #a2a2a2;
+    text-decoration: initial;
+}
+
+#top #copyright a:hover, #top #copyright a:focus { 
+    text-decoration: underline;
+}
+
+/*************************************/
+
+#front {
+    margin-left: 20px;
+    margin-right: 20px;    
+}
+
+#front #title {
+    color: #0b6ec7;
+    font-size: 3.5em;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+}
+
+#front #version {
+    color: #0b6ec7;
+    font-size: 1.6em;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+}
+
+#front #copyright {
+    color: #a2a2a2;
+    font-size: .9em;
+    text-align: center;
+}
+
+#front #copyright a {
+    color: #a2a2a2;
+    text-decoration: initial;
+}
+
+#front #copyright a:hover, #top #copyright a:focus { 
+    text-decoration: underline;
+}
+
+/*************************************/
+
+form.search {
+    margin-bottom: 5px;
+}
+
+#searchTerms {
+    width: 150px;
+}
+
+/*************************************/
+
+li.toc-item {
+    padding: 3px 0pt 3px 16px;
+}
+ul.toc-root>li {
+    padding: 3px 0pt 3px 0px;
+}
+#toc .toc-link {
+    padding-left: 10px;
+}
+.toc-marker {
+    display: inline-block;
+    position: absolute;
+    margin-top: 5px;
+    border-style: solid;
+    border-width: 0 0 6px 6px;
+    border-color: transparent;
+}
+.toc-marker.open {
+    border-width: 0 0 6px 6px;
+    border-color: transparent transparent rgb(192, 192, 192) transparent;
+}
+.toc-marker.closed {
+    border-width: 4px 0 4px 5px;
+    border-color: transparent transparent transparent rgb(192, 192, 192);
+}
+
+/****************** search page *******************/
+
+#search-results a {
+    text-decoration: initial;
+    font-size: 1.1em;
+}
+#search-results a:hover, #search-results a:focus { 
+    text-decoration: underline;
+}
+
+.score {
+    font-size: smaller;
+    color: lightgrey;
+    float: right;   
+}
