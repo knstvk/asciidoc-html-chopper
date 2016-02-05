@@ -23,6 +23,7 @@ class Section (element: Element, level: Int, parent: Section?) {
     lateinit var headerEl: Element
     lateinit var id: String
     lateinit var title: String
+    lateinit var pageTitle: String
     lateinit var tocItem: String
 
     private val SECTION_NUM_PATTERN = Pattern.compile("""(\d+\.)+ """)
@@ -42,8 +43,9 @@ class Section (element: Element, level: Int, parent: Section?) {
                 throw IllegalStateException("No 'id' attribute in '${getBeginning()}'")
             this.id = id
 
+            title = headerEl.ownText()
             tocItem = SECTION_NUM_PATTERN.matcher(headerEl.ownText()).replaceFirst("")
-            title = tocItem + " | " + getHierarchy()[0].title
+            pageTitle = tocItem + " - " + getHierarchy()[0].pageTitle
 
             val ancorEls = headerEl.getElementsByClass("anchor")
             if (ancorEls.isNotEmpty()) {
@@ -71,10 +73,33 @@ class Section (element: Element, level: Int, parent: Section?) {
     private fun getHtmlContent(): String {
         val template = if (parent == null) "index.html" else "page.html"
         val html = File("templates", template).readText()
+        val next = getNext()
         return html
-                .replace("{{title}}", title)
+                .replace("{{pageTitle}}", pageTitle)
                 .replace("{{toc}}", createToc())
                 .replace("{{content}}", if (parent == null) headerEl.outerHtml() else element.outerHtml())
+                .replace("{{next.href}}", next.id + ".html")
+                .replace("{{next.text}}", next.title)
+
+    }
+
+    private fun getNext(): Section {
+        if (!children.isEmpty())
+            return children[0]
+        else {
+            val hierarchy = getHierarchy().reversed()
+            if (hierarchy.size > 1) {
+                for (i in hierarchy.indices.drop(1)) {
+                    val p = hierarchy[i]
+                    val c = hierarchy[i - 1]
+                    if (!c.equals(p.children.last())) {
+                        val indexOfC = p.children.indexOf(c)
+                        return p.children[indexOfC + 1]
+                    }
+                }
+            }
+            return hierarchy.last()
+        }
     }
 
     private fun printTocItem(hierarchy: List<Section>): String {

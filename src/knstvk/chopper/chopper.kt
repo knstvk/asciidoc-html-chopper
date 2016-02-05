@@ -23,6 +23,7 @@ fun main(args: Array<String>) {
 
     val docTitle = headerEl.getElementsByTag("h1").first()?.ownText()
     rootSect.title = docTitle ?: "Index"
+    rootSect.pageTitle = rootSect.title
     rootSect.parse()
 
     val links: MutableMap<String, Section> = HashMap()

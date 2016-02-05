@@ -1,3 +1,8 @@
+h3, h4, h5, h6 {
+    text-align: center;
+}
+
+/*** top & bottom ***/
 
 #top {
     margin-left: 30px;
@@ -38,7 +43,28 @@
     text-decoration: underline;
 }
 
-/*************************************/
+#bottom {
+    margin-left: 30px;
+    margin-right: 20px;    
+    margin-top: 30px;
+    margin-bottom: 20px;    
+}
+
+#bottom #next {
+    color: #0b6ec7;
+    text-align: center;   
+}
+
+#bottom #next a {
+    color: #0b6ec7;
+    text-decoration: initial;
+}
+
+#bottom #next a:hover, #bottom #next a:focus { 
+    text-decoration: underline;
+}
+
+/*** front page ***/
 
 #front {
     margin-left: 20px;
@@ -78,7 +104,7 @@
     text-decoration: underline;
 }
 
-/*************************************/
+/*** search form ***/
 
 form.search {
     margin-bottom: 5px;
@@ -88,7 +114,7 @@ form.search {
     width: 150px;
 }
 
-/*************************************/
+/*** table of contents ***/
 
 li.toc-item {
     padding: 3px 0pt 3px 16px;
@@ -116,7 +142,7 @@ ul.toc-root>li {
     border-color: transparent transparent transparent rgb(192, 192, 192);
 }
 
-/****************** search page *******************/
+/*** search page ***/
 
 #search-results a {
     text-decoration: initial;

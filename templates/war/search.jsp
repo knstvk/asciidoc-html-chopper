@@ -53,23 +53,28 @@
 <div id="content">
     <div id="search-results">
 <%
-	IndexReader reader = DirectoryReader.open(FSDirectory.open(indexDir));
-	IndexSearcher searcher = new IndexSearcher(reader);
-	Analyzer analyzer = new StandardAnalyzer();
-	QueryParser parser = new QueryParser("contents", analyzer);
-	Query query = parser.parse(request.getParameter("searchTerms"));
-	TopDocs results = searcher.search(query, 100);
-	ScoreDoc[] hits = results.scoreDocs;
-	out.println("<p>" + results.totalHits + " results for: " + request.getParameter("searchTerms") + "</p>");
-	for (int i = 0; i < hits.length; i++) {
-		Document doc = searcher.doc(hits[i].doc);
-		String fileName = doc.get("fileName");
-		String caption = doc.get("caption");
-		%>
-		<p><a href="<%= fileName %>"><%= caption %></a> <span class="score"><%= hits[i].score %></span></p>
-		<%	
+	String searchTerms = request.getParameter("searchTerms");
+	if (searchTerms == null || searchTerms.trim().equals("")) {
+		out.println("<p>Please enter a search term</p>");
+	} else {
+		IndexReader reader = DirectoryReader.open(FSDirectory.open(indexDir));
+		IndexSearcher searcher = new IndexSearcher(reader);
+		Analyzer analyzer = new StandardAnalyzer();
+		QueryParser parser = new QueryParser("contents", analyzer);
+		Query query = parser.parse(searchTerms);
+		TopDocs results = searcher.search(query, 100);
+		ScoreDoc[] hits = results.scoreDocs;
+		out.println("<p>" + results.totalHits + " results for: " + searchTerms + "</p>");
+		for (int i = 0; i < hits.length; i++) {
+			Document doc = searcher.doc(hits[i].doc);
+			String fileName = doc.get("fileName");
+			String caption = doc.get("caption");
+			%>
+			<p><a href="<%= fileName %>"><%= caption %></a> <span class="score"><%= hits[i].score %></span></p>
+			<%	
+		}
+		reader.close();
 	}
-	reader.close();
 %>
 	</div>
 </div>
