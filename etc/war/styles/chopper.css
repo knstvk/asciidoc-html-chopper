@@ -29,7 +29,7 @@ h3, h4, h5, h6 {
 
 #top #copyright {
     color: #a2a2a2;
-    font-size: .9em;
+    font-size: .8em;
     display: inline-block;
     float: right;   
 }
@@ -145,11 +145,19 @@ ul.toc-root>li {
 /*** search page ***/
 
 #search-results a {
-    text-decoration: initial;
-    font-size: 1.1em;
+    line-height: 2;
 }
+
+#search-results a {
+    text-decoration: initial;
+}
+
 #search-results a:hover, #search-results a:focus { 
     text-decoration: underline;
+}
+
+#search-results a .path {
+    opacity: 0.5;
 }
 
 .score {

@@ -70,17 +70,21 @@ class Section (element: Element, level: Int, parent: Section?) {
 
     private fun getBeginning(): String = element.outerHtml().substring(0, 100) + "..."
 
-    private fun getHtmlContent(): String {
+    private fun getHtmlContent(context: Context): String {
         val template = if (parent == null) "index.html" else "page.html"
-        val html = File("templates", template).readText()
+        var html = File(context.etcDir, template).readText()
         val next = getNext()
-        return html
-                .replace("{{pageTitle}}", pageTitle)
-                .replace("{{toc}}", createToc())
-                .replace("{{content}}", if (parent == null) headerEl.outerHtml() else element.outerHtml())
-                .replace("{{next.href}}", next.id + ".html")
-                .replace("{{next.text}}", next.title)
 
+        val vars = Properties(context.vars)
+        vars.setProperty("pageTitle", pageTitle)
+        vars.setProperty("toc", createToc())
+        vars.setProperty("content", if (parent == null) headerEl.outerHtml() else element.outerHtml())
+        vars.setProperty("next.href", next.id + ".html")
+        vars.setProperty("next.text", next.title)
+        for (name in vars.stringPropertyNames()) {
+            html = html.replace("{{" + name + "}}", vars.getProperty(name))
+        }
+        return html
     }
 
     private fun getNext(): Section {
@@ -121,7 +125,7 @@ class Section (element: Element, level: Int, parent: Section?) {
         return sb.toString()
     }
 
-    private fun createToc(): String {
+    fun createToc(): String {
         val sb = StringBuilder()
 
         sb.append("\n<ul class='toc-root'>")
@@ -173,25 +177,23 @@ class Section (element: Element, level: Int, parent: Section?) {
         return parents
     }
 
-    fun write(dir: File, links: MutableMap<String, Section>, indexWriter: IndexWriter?) {
-        replaceLinks(links)
+    fun write(context: Context) {
+        replaceLinks(context.links)
 
-        val content = getHtmlContent()
+        val content = getHtmlContent(context)
 
         val fileName = id + ".html"
-        val file = File(dir, fileName)
+        val file = File(context.outputDir, fileName)
         file.writeText(content, "UTF-8")
 
-        if (indexWriter != null) {
-            indexFile(element.text(), fileName, indexWriter)
-        }
+        indexFile(element.text(), fileName, context.indexWriter)
 
         for (childSect in children) {
-            childSect.write(dir, links, indexWriter)
+            childSect.write(context)
         }
     }
 
-    fun replaceLinks(links: MutableMap<String, Section>) {
+    fun replaceLinks(links: Map<String, Section>) {
         val aElements = element.getElementsByTag("a")
         for (aEl in aElements) {
             val href = aEl.attr("href")
@@ -199,7 +201,7 @@ class Section (element: Element, level: Int, parent: Section?) {
                 val ref = href.substring(1)
                 val section = links[ref]
                 if (section == null) {
-                    println("WARNING: unknown link: $href")
+                    println("Unknown link: $href")
                     continue
                 }
                 if (section !== this) {
@@ -211,18 +213,22 @@ class Section (element: Element, level: Int, parent: Section?) {
     }
 
     private fun indexFile(contents: String, fileName: String, indexWriter: IndexWriter) {
-        val caption: String
+        var captionPath: String
+        val captionName = tocItem
         val hierarchy = getHierarchy()
         if (hierarchy.size == 1) {
-            caption = tocItem
+            captionPath = ""
         } else {
-            caption = hierarchy.subList(1, hierarchy.size).map { it.tocItem }.joinToString(" > ")
+            captionPath = hierarchy.subList(1, hierarchy.size - 1).map { it.tocItem }.joinToString(" > ")
+            if (!captionPath.isEmpty())
+                captionPath += " >"
         }
 
         val doc = Document()
 
         doc.add(StringField("fileName", fileName, Field.Store.YES))
-        doc.add(StringField("caption", StringEscapeUtils.escapeHtml4(caption), Field.Store.YES))
+        doc.add(StringField("captionPath", StringEscapeUtils.escapeHtml4(captionPath), Field.Store.YES))
+        doc.add(StringField("captionName", StringEscapeUtils.escapeHtml4(captionName), Field.Store.YES))
         doc.add(TextField("contents", StringReader(contents)))
 
         indexWriter.addDocument(doc)

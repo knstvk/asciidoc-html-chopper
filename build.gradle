@@ -10,6 +10,7 @@ buildscript {
 
 apply plugin: 'kotlin'
 apply plugin: 'idea'
+apply plugin: 'application'
 
 repositories {
     mavenCentral()
@@ -35,4 +36,11 @@ sourceSets {
         resources { srcDir 'test' }
         kotlin { srcDir 'src' }
     }
+}
+
+applicationName = "asciidoc-html-chopper"
+mainClassName = "knstvk.chopper.ChopperKt"
+
+applicationDistribution.from(file('etc')) {
+    into "etc"
 }
