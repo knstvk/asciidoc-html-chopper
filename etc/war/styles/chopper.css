@@ -153,7 +153,7 @@ ul.toc-root>li {
 }
 
 #search-results a:hover, #search-results a:focus { 
-    text-decoration: underline;
+    color: #0b6ec7;
 }
 
 #search-results a .path {

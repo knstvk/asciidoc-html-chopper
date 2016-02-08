@@ -7,16 +7,20 @@ import org.apache.lucene.store.FSDirectory
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.File
+import java.io.InputStreamReader
 import java.util.*
 
 fun main(args: Array<String>) {
     var inputFileArg: String? = null
     var outputDirArg: String? = null
+    var locale: String = ""
     for ((idx, arg) in args.withIndex()) {
         if (arg.equals("-inputFile")) {
             inputFileArg = getArg(args, idx)
         } else if (arg.equals("-outputDir")) {
             outputDirArg = getArg(args, idx)
+        } else if (arg.equals("-loc")) {
+            locale = getArg(args, idx)
         }
     }
     if (inputFileArg == null || outputDirArg == null) {
@@ -38,7 +42,7 @@ fun main(args: Array<String>) {
     val srcDir = input.parentFile
     val doc = Jsoup.parse(input, "UTF-8")
 
-    val vars = loadProperties(etcDir, doc)
+    val vars = loadProperties(etcDir, locale, doc)
 
     val headerEl = doc.getElementById("header") ?: throw IllegalStateException("Element with id='header' is not found")
     val contentEl = doc.getElementById("content") ?: throw IllegalStateException("Element with id='content' is not found")
@@ -49,6 +53,7 @@ fun main(args: Array<String>) {
     val docTitle = headerEl.getElementsByTag("h1").first()?.ownText()
     rootSect.title = docTitle ?: "Index"
     rootSect.pageTitle = rootSect.title
+    rootSect.tocItem = vars.getProperty("home")
     rootSect.parse()
 
     val links: MutableMap<String, Section> = HashMap()
@@ -79,14 +84,14 @@ private fun printUsageAndExit() {
     System.exit(-1)
 }
 
-private fun loadProperties(etcDir: File, doc: Document): Properties {
+private fun loadProperties(etcDir: File, locale: String, doc: Document): Properties {
     val vars = Properties()
 
     // load from file
-    val file = File(etcDir, "var.properties")
+    val file = File(etcDir, if (locale.isEmpty()) "var.properties" else "var_$locale.properties")
     if (file.exists()) {
         val inputStream = file.inputStream()
-        vars.load(inputStream)
+        vars.load(InputStreamReader(inputStream, "UTF-8"))
         inputStream.close()
     }
 

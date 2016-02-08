@@ -31,7 +31,6 @@ class Section (element: Element, level: Int, parent: Section?) {
     fun parse() {
         if (parent == null) {
             id = "index"
-            tocItem = "Home"
         } else {
             val hEls = element.getElementsByTag("h${level + 1}")
             if (hEls.isEmpty())
@@ -186,7 +185,7 @@ class Section (element: Element, level: Int, parent: Section?) {
         val file = File(context.outputDir, fileName)
         file.writeText(content, "UTF-8")
 
-        indexFile(element.text(), fileName, context.indexWriter)
+        indexFile(element.text(), fileName, context)
 
         for (childSect in children) {
             childSect.write(context)
@@ -212,16 +211,17 @@ class Section (element: Element, level: Int, parent: Section?) {
         }
     }
 
-    private fun indexFile(contents: String, fileName: String, indexWriter: IndexWriter) {
+    private fun indexFile(contents: String, fileName: String, context: Context) {
         var captionPath: String
         val captionName = tocItem
         val hierarchy = getHierarchy()
         if (hierarchy.size == 1) {
             captionPath = ""
         } else {
-            captionPath = hierarchy.subList(1, hierarchy.size - 1).map { it.tocItem }.joinToString(" > ")
+            val sep = context.vars.getProperty("pathSeparator")
+            captionPath = hierarchy.subList(1, hierarchy.size - 1).map { it.tocItem }.joinToString(" $sep ")
             if (!captionPath.isEmpty())
-                captionPath += " >"
+                captionPath += " $sep"
         }
 
         val doc = Document()
@@ -231,6 +231,6 @@ class Section (element: Element, level: Int, parent: Section?) {
         doc.add(StringField("captionName", StringEscapeUtils.escapeHtml4(captionName), Field.Store.YES))
         doc.add(TextField("contents", StringReader(contents)))
 
-        indexWriter.addDocument(doc)
+        context.indexWriter.addDocument(doc)
     }
 }

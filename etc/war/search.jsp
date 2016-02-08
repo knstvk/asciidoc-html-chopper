@@ -31,7 +31,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Search Results for: <%= searchTerms %></title>
+    <title>{{searchResultsTitle}} <%= searchTerms %></title>
     <link rel="stylesheet" href="./styles/cuba.css">
     <link rel="stylesheet" href="./styles/chopper.css">
     <link rel="stylesheet" href="./styles/coderay-asciidoctor.css">
@@ -40,7 +40,7 @@
 <div id="toc" class="toc2">
     <form action="search.jsp" class="search">
         <input type="text" name="searchTerms" value="<%= request.getParameter("searchTerms") %>">
-        <input type="submit" value="Search">
+        <input type="submit" value="{{search}}">
     </form>
     {{toc}}
 </div>
@@ -53,7 +53,7 @@
     <div id="search-results">
 <%
 	if (searchTerms == null || searchTerms.trim().equals("")) {
-		out.println("<p>Please enter a search term</p>");
+		out.println("<p>{{searchTermIsEmpty}}</p>");
 	} else {
 		IndexReader reader = DirectoryReader.open(FSDirectory.open(indexDir));
 		IndexSearcher searcher = new IndexSearcher(reader);
@@ -62,7 +62,7 @@
 		Query query = parser.parse(searchTerms);
 		TopDocs results = searcher.search(query, 100);
 		ScoreDoc[] hits = results.scoreDocs;
-		out.println("<p>" + results.totalHits + " results for: " + searchTerms + "</p>");
+		out.println("<p>" + results.totalHits + " {{searchResultsMsg}} " + searchTerms + "</p>");
 		out.println("</ul>");
 		for (int i = 0; i < hits.length; i++) {
 			Document doc = searcher.doc(hits[i].doc);
