@@ -1,4 +1,4 @@
-package knstvk.chopper
+package chopper
 
 import org.apache.commons.lang3.StringEscapeUtils
 import org.apache.lucene.document.Document

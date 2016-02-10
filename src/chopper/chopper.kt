@@ -1,4 +1,4 @@
-package knstvk.chopper
+package chopper
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.index.IndexWriter
