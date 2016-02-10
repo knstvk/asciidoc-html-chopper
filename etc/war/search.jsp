@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="java.util.*,java.io.*,java.nio.file.*" %>    
+<%@ page import="java.util.*,java.io.*,java.nio.file.*,java.nio.file.attribute.*" %>    
 <%@ page import="org.apache.lucene.analysis.*,org.apache.lucene.analysis.standard.StandardAnalyzer" %>    
 <%@ page import="org.apache.lucene.document.Document,org.apache.lucene.index.*" %>    
 <%@ page import="org.apache.lucene.queryparser.classic.QueryParser,org.apache.lucene.search.*,org.apache.lucene.store.FSDirectory" %>    
@@ -22,6 +22,32 @@
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error initializing JSP: " + e);
+		}
+	}
+
+	public void jspDestroy() {
+		if (indexDir != null && Files.exists(indexDir)) {
+			try {
+				Files.walkFileTree(indexDir, new SimpleFileVisitor<Path>() {
+			        @Override
+			        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+			            Files.delete(file);
+			            return FileVisitResult.CONTINUE;
+			        }
+
+			        @Override
+			        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+			            if (exc == null) {
+			                Files.delete(dir);
+			                return FileVisitResult.CONTINUE;
+			            } else {
+			                throw exc;
+			            }
+			        }
+		        });
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
