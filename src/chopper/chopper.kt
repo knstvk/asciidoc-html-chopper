@@ -165,7 +165,7 @@ private fun prepareOutputDir(outputDirArg: String?, rootSect: Section, srcDir: F
 }
 
 private fun createIndexWriter(outputDir: File): IndexWriter {
-    val dir = FSDirectory.open(File(outputDir, "index").toPath())
+    val dir = FSDirectory.open(File(outputDir, "WEB-INF/index").toPath())
     val analyzer = StandardAnalyzer()
     val iwc = IndexWriterConfig(analyzer)
     iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND)

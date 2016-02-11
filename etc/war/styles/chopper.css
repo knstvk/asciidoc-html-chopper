@@ -7,7 +7,7 @@ h3, h4, h5, h6 {
 #top {
     border-bottom: 1px solid #ddd;
     padding-top: 8px;    
-    padding-bottom: 8px;    
+    padding-bottom: 16px;    
 }
 
 #top #title {
@@ -15,6 +15,7 @@ h3, h4, h5, h6 {
     font-size: 1.2em;
     font-weight: bold;
     text-align: left;
+    padding-bottom: 5px;
 }
 
 #top #version {
@@ -23,6 +24,7 @@ h3, h4, h5, h6 {
     font-weight: bold;
     text-align: left;
     display: inline-block;
+    float: left;
 }
 
 #top #copyright {

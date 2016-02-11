@@ -13,11 +13,12 @@
 			indexDir = Files.createTempDirectory(tmpDir, "index");  
 			System.out.println("Copying index to " + indexDir);
 
-			Set<String> resourcePaths = getServletContext().getResourcePaths("/index");
+			Set<String> resourcePaths = getServletContext().getResourcePaths("/WEB-INF/index");
 			for (String resource : resourcePaths) {
 				Path file = indexDir.resolve(Paths.get(resource).getFileName());
 				InputStream is = getServletContext().getResourceAsStream(resource);
 				Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
+				is.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -63,17 +64,19 @@
     <link rel="stylesheet" href="./styles/coderay-asciidoctor.css">
 </head>
 <body class="book toc2 toc-left">
-<div id="toc" class="toc2">
-    <form action="search.jsp" class="search">
-        <input type="text" name="searchTerms" value="<%= request.getParameter("searchTerms") %>">
-        <input type="submit" value="{{search}}">
-    </form>
-    {{toc}}
-</div>
-<div id="top">
-    <div id="title">{{title}}</div>
-    <div id="version">{{version}}</div>
-    <div id="copyright">{{copyright}}</div>
+<div id="header">
+    <div id="toc" class="toc2">
+        <form action="search.jsp" class="search">
+            <input type="text" name="searchTerms" value="<%= request.getParameter("searchTerms") %>">
+            <input type="submit" value="{{search}}">
+        </form>
+        {{toc}}
+    </div>
+    <div id="top">
+        <div id="title">{{title}}</div>
+        <div id="version">{{version}}</div>
+        <div id="copyright">{{copyright}}</div>
+    </div>
 </div>
 <div id="content">
     <div id="search-results">
