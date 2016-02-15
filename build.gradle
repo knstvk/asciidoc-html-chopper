@@ -20,6 +20,10 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    deployerJars
+}
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     compile 'org.jsoup:jsoup:1.8.3'
@@ -27,6 +31,7 @@ dependencies {
     compile 'org.apache.lucene:lucene-core:5.4.1'
     compile 'org.apache.lucene:lucene-queryparser:5.4.1'
     compile 'org.apache.lucene:lucene-analyzers-common:5.4.1'
+    deployerJars('org.apache.maven.wagon:wagon-http:2.9')
 }
 
 sourceSets {
@@ -47,4 +52,14 @@ mainClassName = "chopper.ChopperKt"
 
 applicationDistribution.from(file('etc')) {
     into "etc"
+}
+
+uploadArchives.configure {
+    repositories.mavenDeployer {
+        name = 'httpDeployer'
+        configuration = configurations.deployerJars
+        repository(url: "http://repository.haulmont.com:8587/nexus/content/repositories/thirdparty") {
+            authentication(userName: System.getenv('HAULMONT_REPOSITORY_USER'), password: System.getenv('HAULMONT_REPOSITORY_PASSWORD'))
+        }
+    }
 }
