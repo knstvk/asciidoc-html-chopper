@@ -4,6 +4,7 @@
 <%@ page import="org.apache.lucene.analysis.*,org.apache.lucene.analysis.standard.StandardAnalyzer" %>    
 <%@ page import="org.apache.lucene.document.Document,org.apache.lucene.index.*" %>    
 <%@ page import="org.apache.lucene.queryparser.classic.QueryParser,org.apache.lucene.search.*,org.apache.lucene.store.FSDirectory" %>    
+<%@ page import="org.apache.commons.lang3.StringEscapeUtils" %>
 <%!
 	Path indexDir = null;
 	
@@ -53,12 +54,15 @@
 	}
 
 %>
-<% String searchTerms = request.getParameter("searchTerms"); %>
+<%
+String searchTerms = request.getParameter("searchTerms");
+String htmlSearchTerms = StringEscapeUtils.escapeHtml4(searchTerms);
+%>
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{searchResultsTitle}} <%= searchTerms %></title>
+    <title>{{searchResultsTitle}} <%= htmlSearchTerms %></title>
     <link rel="stylesheet" href="./styles/cuba.css">
     <link rel="stylesheet" href="./styles/chopper.css">
     <link rel="stylesheet" href="./styles/coderay-asciidoctor.css">
@@ -67,7 +71,7 @@
 <div id="header">
     <div id="toc" class="toc2">
         <form action="search.jsp" class="search">
-            <input type="text" name="searchTerms" value="<%= request.getParameter("searchTerms") %>">
+            <input type="text" name="searchTerms" value="<%= htmlSearchTerms %>">
             <input type="submit" value="{{search}}">
         </form>
         {{toc}}
@@ -88,10 +92,10 @@
 		IndexSearcher searcher = new IndexSearcher(reader);
 		Analyzer analyzer = new StandardAnalyzer();
 		QueryParser parser = new QueryParser("contents", analyzer);
-		Query query = parser.parse(searchTerms);
+		Query query = parser.parse(parser.escape(searchTerms));
 		TopDocs results = searcher.search(query, 100);
 		ScoreDoc[] hits = results.scoreDocs;
-		out.println("<p>" + results.totalHits + " {{searchResultsMsg}} " + searchTerms + "</p>");
+		out.println("<p>" + results.totalHits + " {{searchResultsMsg}} " + htmlSearchTerms + "</p>");
 		out.println("</ul>");
 		for (int i = 0; i < hits.length; i++) {
 			Document doc = searcher.doc(hits[i].doc);
