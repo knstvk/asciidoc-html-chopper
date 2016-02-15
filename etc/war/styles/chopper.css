@@ -18,6 +18,15 @@ h3, h4, h5, h6 {
     padding-bottom: 5px;
 }
 
+#top #title a {
+    color: #0b6ec7;
+    text-decoration: initial;
+}
+
+#top #title a:hover {
+    text-decoration: underline;
+}
+
 #top #version {
     color: #0b6ec7;
     font-size: 0.9em;
@@ -46,7 +55,7 @@ h3, h4, h5, h6 {
 #bottom {
     margin-left: 30px;
     margin-right: 20px;    
-    margin-top: 30px;
+    margin-top: 80px;
     margin-bottom: 20px;    
 }
 
@@ -78,6 +87,15 @@ h3, h4, h5, h6 {
     text-align: center;
     margin-top: 1.5em;
     margin-bottom: 1.5em;
+}
+
+#front #title a {
+    color: #0b6ec7;
+    text-decoration: initial;
+}
+
+#front #title a:hover {
+    text-decoration: underline;
 }
 
 #front #version {
