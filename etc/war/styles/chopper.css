@@ -179,7 +179,8 @@ ul.toc-root>li {
 }
 
 .score {
-    font-size: smaller;
+    display: none;
+    /*font-size: smaller;
     color: lightgrey;
-    float: right;   
+    float: right;*/
 }
