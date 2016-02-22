@@ -1,13 +1,10 @@
 package chopper
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer
-import org.apache.lucene.index.IndexWriter
-import org.apache.lucene.index.IndexWriterConfig
-import org.apache.lucene.store.FSDirectory
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.File
 import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 fun main(args: Array<String>) {
@@ -61,11 +58,11 @@ fun main(args: Array<String>) {
 
     val outputDir = prepareOutputDir(outputDirArg, rootSect, srcDir, etcDir, vars)
 
-    val indexWriter = createIndexWriter(outputDir)
+    val indexContent = StringBuilder()
 
-    rootSect.write(Context(outputDir, etcDir, links, vars, indexWriter))
+    rootSect.write(Context(outputDir, etcDir, links, vars, indexContent))
 
-    indexWriter.close()
+    File(outputDir, "WEB-INF/index.txt").writeText(indexContent.toString())
 
     println("""Done in ${(System.currentTimeMillis() - startTime) / 1000}s""")
 }
@@ -150,25 +147,17 @@ private fun prepareOutputDir(outputDirArg: String?, rootSect: Section, srcDir: F
             dstFile.mkdir()
         } else {
             if (arrayOf("jsp", "html", "css").contains(file.extension)) {
-                var text = file.readText("UTF-8")
+                var text = file.readText(StandardCharsets.UTF_8)
                 vars.setProperty("toc", rootSect.createToc())
                 for (name in vars.stringPropertyNames()) {
                     text = text.replace("{{" + name + "}}", vars.getProperty(name))
                 }
-                dstFile.writeText(text, "UTF-8")
+                dstFile.writeText(text, StandardCharsets.UTF_8)
             } else {
                 file.copyTo(dstFile)
             }
         }
     }
-    return outputDir
-}
 
-private fun createIndexWriter(outputDir: File): IndexWriter {
-    val dir = FSDirectory.open(File(outputDir, "WEB-INF/index").toPath())
-    val analyzer = StandardAnalyzer()
-    val iwc = IndexWriterConfig(analyzer)
-    iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND)
-    val indexWriter = IndexWriter(dir, iwc)
-    return indexWriter
+    return outputDir
 }

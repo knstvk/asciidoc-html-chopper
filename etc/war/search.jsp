@@ -1,55 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="java.util.*,java.io.*,java.nio.file.*,java.nio.file.attribute.*" %>    
-<%@ page import="org.apache.lucene.analysis.*,org.apache.lucene.analysis.standard.StandardAnalyzer" %>    
-<%@ page import="org.apache.lucene.document.Document,org.apache.lucene.index.*" %>    
-<%@ page import="org.apache.lucene.queryparser.classic.QueryParser,org.apache.lucene.search.*,org.apache.lucene.store.FSDirectory" %>    
+<%@ page import="java.util.*,java.io.*" %>    
 <%@ page import="org.apache.commons.lang3.StringEscapeUtils" %>
+<%@ page import="chopper.search.Search,chopper.search.SearchResult" %>
 <%!
-	Path indexDir = null;
+	Search search = null;
 	
 	public void jspInit() { 
 		try {
-			Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
-			indexDir = Files.createTempDirectory(tmpDir, "index");  
-			System.out.println("Copying index to " + indexDir);
-
-			Set<String> resourcePaths = getServletContext().getResourcePaths("/WEB-INF/index");
-			for (String resource : resourcePaths) {
-				Path file = indexDir.resolve(Paths.get(resource).getFileName());
-				InputStream is = getServletContext().getResourceAsStream(resource);
-				Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
-				is.close();
-			}
-		} catch (IOException e) {
+			System.out.println("Loading index from /WEB-INF/index.txt");
+			search = new Search(getServletContext().getResourceAsStream("/WEB-INF/index.txt"));
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error initializing JSP: " + e);
-		}
-	}
-
-	public void jspDestroy() {
-		if (indexDir != null && Files.exists(indexDir)) {
-			try {
-				Files.walkFileTree(indexDir, new SimpleFileVisitor<Path>() {
-			        @Override
-			        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-			            Files.delete(file);
-			            return FileVisitResult.CONTINUE;
-			        }
-
-			        @Override
-			        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-			            if (exc == null) {
-			                Files.delete(dir);
-			                return FileVisitResult.CONTINUE;
-			            } else {
-			                throw exc;
-			            }
-			        }
-		        });
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -57,6 +20,7 @@
 <%
 String searchTerms = request.getParameter("searchTerms");
 String htmlSearchTerms = StringEscapeUtils.escapeHtml4(searchTerms);
+long start = System.currentTimeMillis();
 %>
 <!doctype html>
 <html lang="en">
@@ -87,31 +51,27 @@ String htmlSearchTerms = StringEscapeUtils.escapeHtml4(searchTerms);
 <%
 	if (searchTerms == null || searchTerms.trim().equals("")) {
 		out.println("<p>{{searchTermIsEmpty}}</p>");
+	} else if (searchTerms.length() < 3) {
+		out.println("<p>{{searchTermIsTooShort}}</p>");
 	} else {
-		IndexReader reader = DirectoryReader.open(FSDirectory.open(indexDir));
-		IndexSearcher searcher = new IndexSearcher(reader);
-		Analyzer analyzer = new StandardAnalyzer();
-		QueryParser parser = new QueryParser("contents", analyzer);
-		parser.setAllowLeadingWildcard(true);
-		Query query = parser.parse("*" + parser.escape(searchTerms).trim() + "*");
-		TopDocs results = searcher.search(query, 100);
-		ScoreDoc[] hits = results.scoreDocs;
-		out.println("<p>" + results.totalHits + " {{searchResultsMsg}} " + htmlSearchTerms + "</p>");
-		out.println("</ul>");
-		for (int i = 0; i < hits.length; i++) {
-			Document doc = searcher.doc(hits[i].doc);
+		List<SearchResult> results = search.search(searchTerms);
+		out.println("<p>" + results.size() + " {{searchResultsMsg}} " + htmlSearchTerms + "</p>");
+		for (SearchResult result : results) {
 			%>
-			<li>
-				<a href="<%= doc.get("fileName") %>">
-					<span class="path"><%= doc.get("captionPath") %></span>
-					<span class="name"><%= doc.get("captionName") %></span>
-				</a> 
-				<span class="score"><%= hits[i].score %></span>
-			</li>
+			<div class="res">
+				<div class="res-name">
+					<a href="<%= result.fileName %>"><span class="name"><%= result.captionName %></span></a>
+				</div>
+				<div class="res-path"><%= result.captionPath %> <%= result.captionName %></div>
+				<%
+					for (String hit : result.hits) {
+						out.println(hit);
+					}
+				%> 
+			</div>
 			<%	
 		}
-		reader.close();
-		out.println("</ul>");
+		System.out.println("Search for '" + htmlSearchTerms + "' completed in " + (System.currentTimeMillis() - start) + "ms");
 	}
 %>
 	</div>

@@ -162,25 +162,25 @@ ul.toc-root>li {
 
 /*** search page ***/
 
+#search-results .res {
+    margin-top: 10px;
+}
+
 #search-results a {
     line-height: 2;
 }
 
-#search-results a {
-    text-decoration: initial;
-}
-
-#search-results a:hover, #search-results a:focus { 
+#search-results .res-path {
+    font-size: small;
     color: #0b6ec7;
 }
 
-#search-results a .path {
+.hit-info {
     opacity: 0.5;
+    font-size: smaller;
+    line-height: 1.5;
 }
 
-.score {
-    display: none;
-    /*font-size: smaller;
-    color: lightgrey;
-    float: right;*/
+.hit-info .hit {
+    font-weight: bold;
 }

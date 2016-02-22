@@ -1,14 +1,9 @@
 package chopper
 
 import org.apache.commons.lang3.StringEscapeUtils
-import org.apache.lucene.document.Document
-import org.apache.lucene.document.Field
-import org.apache.lucene.document.StringField
-import org.apache.lucene.document.TextField
-import org.apache.lucene.index.IndexWriter
 import org.jsoup.nodes.Element
 import java.io.File
-import java.io.StringReader
+import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.regex.Pattern
 
@@ -183,7 +178,7 @@ class Section (element: Element, level: Int, parent: Section?) {
 
         val fileName = id + ".html"
         val file = File(context.outputDir, fileName)
-        file.writeText(content, "UTF-8")
+        file.writeText(content, StandardCharsets.UTF_8)
 
         indexFile(element.text(), fileName, context)
 
@@ -224,13 +219,11 @@ class Section (element: Element, level: Int, parent: Section?) {
                 captionPath += " $sep"
         }
 
-        val doc = Document()
+        var text = contents.replace("\n", " ").replace("\r", " ").replace("\t", " ").replace(Regex("\\s+"), " ")
 
-        doc.add(StringField("fileName", fileName, Field.Store.YES))
-        doc.add(StringField("captionPath", StringEscapeUtils.escapeHtml4(captionPath), Field.Store.YES))
-        doc.add(StringField("captionName", StringEscapeUtils.escapeHtml4(captionName), Field.Store.YES))
-        doc.add(TextField("contents", StringReader(contents)))
-
-        context.indexWriter.addDocument(doc)
+        context.indexContent.append(fileName).append("\t")
+        context.indexContent.append(StringEscapeUtils.escapeHtml4(captionPath)).append("\t")
+        context.indexContent.append(StringEscapeUtils.escapeHtml4(captionName)).append("\t")
+        context.indexContent.append(text).append("\n")
     }
 }
