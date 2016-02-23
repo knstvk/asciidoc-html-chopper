@@ -16,16 +16,18 @@ public class Search {
     private static final int LEN = 70;
 
     private static class Sect {
-        String fileName;
-        String captionPath;
-        String captionName;
-        String text;
+        final String fileName;
+        final String captionPath;
+        final String captionName;
+        final String text;
+        final String lcText;
 
         public Sect(String fileName, String captionPath, String captionName, String text) {
             this.fileName = fileName;
             this.captionPath = captionPath;
             this.captionName = captionName;
             this.text = text;
+            this.lcText = text.toLowerCase();
         }
     }
 
@@ -54,8 +56,23 @@ public class Search {
     public List<SearchResult> search(String term) {
         List<SearchResult> results = new ArrayList<>();
 
+        boolean ignoreCase = true;
+        for (int i = 0; i < term.length(); i++) {
+            if (Character.isLetter(term.charAt(i)) && Character.isUpperCase(term.charAt(i))) {
+                ignoreCase = false;
+                break;
+            }
+        }
+
         for (Sect sect : sections) {
-            int idx = sect.text.indexOf(term);
+            String text;
+            if (ignoreCase) {
+                term = term.toLowerCase();
+                text = sect.lcText;
+            } else {
+                text = sect.text;
+            }
+            int idx = text.indexOf(term);
             if (idx > -1) {
                 SearchResult result = new SearchResult(sect.fileName, sect.captionPath, sect.captionName);
                 int start = 0;
@@ -72,7 +89,14 @@ public class Search {
                     result.hits.add(hit.toString());
 
                     start = idx + 1;
-                    idx = sect.text.indexOf(term, start);
+                    idx = text.indexOf(term, start);
+                }
+                if (result.hits.size() > 10) {
+                    int more = result.hits.size() - 10;
+                    while (result.hits.size() > 10) {
+                        result.hits.remove(result.hits.size() - 1);
+                    }
+                    result.hits.add("<div class=\"hit-info\">" + "And " + more + " more" + "</div>");
                 }
                 results.add(result);
             }

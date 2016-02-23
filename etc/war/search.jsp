@@ -35,7 +35,7 @@ long start = System.currentTimeMillis();
 <div id="header">
     <div id="toc" class="toc2">
         <form action="search.jsp" class="search">
-            <input type="text" name="searchTerms" value="<%= htmlSearchTerms %>">
+            <input type="text" name="searchTerms" value="<%= htmlSearchTerms %>" autofocus>
             <input type="submit" value="{{search}}">
         </form>
         {{toc}}
