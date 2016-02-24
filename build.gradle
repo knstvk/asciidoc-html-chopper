@@ -47,8 +47,8 @@ sourceSets {
 
 assemble << {
     copy {
-        from "${buildDir}/classes/main/chopper/search"
-        into "etc/war/WEB-INF/classes/chopper/search"
+        from "${buildDir}/classes/main/chopper/server"
+        into "etc/war/WEB-INF/classes/chopper/server"
     }
 }
 

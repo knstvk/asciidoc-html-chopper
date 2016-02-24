@@ -1,4 +1,4 @@
-package chopper.search;
+package chopper.server;
 
 import java.util.ArrayList;
 import java.util.List;

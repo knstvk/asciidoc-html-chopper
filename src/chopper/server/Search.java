@@ -1,4 +1,4 @@
-package chopper.search;
+package chopper.server;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 

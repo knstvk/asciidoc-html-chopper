@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ page import="java.util.*,java.io.*" %>    
 <%@ page import="org.apache.commons.lang3.StringEscapeUtils" %>
-<%@ page import="chopper.search.Search,chopper.search.SearchResult" %>
+<%@ page import="chopper.server.Search,chopper.server.SearchResult" %>
 <%!
 	Search search = null;
 	

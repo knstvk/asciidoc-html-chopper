@@ -1,4 +1,4 @@
-import chopper.search.Search
+import chopper.server.Search
 import org.junit.Assert
 import org.junit.Test
 import java.nio.charset.StandardCharsets
