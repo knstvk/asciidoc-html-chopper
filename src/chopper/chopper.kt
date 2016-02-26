@@ -11,6 +11,7 @@ fun main(args: Array<String>) {
     var inputFileArg: String? = null
     var outputDirArg: String? = null
     var locale: String = ""
+    var varsOverridesPath: String = ""
     for ((idx, arg) in args.withIndex()) {
         if (arg.equals("-inputFile")) {
             inputFileArg = getArg(args, idx)
@@ -18,6 +19,8 @@ fun main(args: Array<String>) {
             outputDirArg = getArg(args, idx)
         } else if (arg.equals("-loc")) {
             locale = getArg(args, idx)
+        } else if (arg.equals("-vars")) {
+            varsOverridesPath = getArg(args, idx)
         }
     }
     if (inputFileArg == null || outputDirArg == null) {
@@ -39,7 +42,7 @@ fun main(args: Array<String>) {
     val srcDir = input.parentFile
     val doc = Jsoup.parse(input, "UTF-8")
 
-    val vars = loadProperties(etcDir, locale, doc)
+    val vars = loadProperties(etcDir, locale, varsOverridesPath, doc)
 
     val headerEl = doc.getElementById("header") ?: throw IllegalStateException("Element with id='header' is not found")
     val contentEl = doc.getElementById("content") ?: throw IllegalStateException("Element with id='content' is not found")
@@ -77,11 +80,13 @@ private fun getArg(args: Array<String>, i: Int): String {
 private fun printUsageAndExit() {
     println("""Arguments:
 -inputFile    path to the source root HTML file
--outputDir    path to the output directory""")
+-outputDir    path to the output directory
+-loc          (optional) locale
+-vars         (optional) path to a properties file with additional or overriding variables""")
     System.exit(-1)
 }
 
-private fun loadProperties(etcDir: File, locale: String, doc: Document): Properties {
+private fun loadProperties(etcDir: File, locale: String, varsOverridesPath: String, doc: Document): Properties {
     val vars = Properties()
 
     // load from file
@@ -111,6 +116,20 @@ private fun loadProperties(etcDir: File, locale: String, doc: Document): Propert
     val copyrightEl = doc.body().getElementById("revremark")
     if (copyrightEl != null && !vars.containsKey("copyright")) {
         vars.setProperty("copyright", copyrightEl.ownText());
+    }
+
+    if (!varsOverridesPath.isEmpty()) {
+        val varsFile = File(varsOverridesPath)
+        if (varsFile.exists()) {
+            val inputStream = varsFile.inputStream()
+            val varOverrides = Properties()
+            varOverrides.load(InputStreamReader(inputStream, "UTF-8"))
+            inputStream.close()
+
+            for (name in varOverrides.stringPropertyNames()) {
+                vars.setProperty(name, varOverrides.getProperty(name))
+            }
+        }
     }
 
     return vars
